@@ -116,7 +116,7 @@ static void gst_cedarh264enc_class_init(GstCedarH264EncClass *klass)
 		"cedar_h264enc",
 		"CedarX H264 Encoder",
 		"H264 Encoder Plugin for CedarX hardware",
-		"Enrico Butera <ebutera@users.berlios.de>, Kyle Hu <kyle.hu.gz@gmail.com>");
+		"Enrico Butera <ebutera@users.berlios.de>, Kyle Hu <kyle.hu.gz@gmail.com>, George Talusan <george.talusan@gmail.com>");
 
 	gst_element_class_add_pad_template(gstelement_class, gst_static_pad_template_get(&src_factory));
 	gst_element_class_add_pad_template(gstelement_class, gst_static_pad_template_get(&sink_factory));
@@ -390,5 +390,5 @@ GST_PLUGIN_DEFINE (
 	VERSION,
 	"LGPL",
 	"Sunxi",
-	"http://github.com/gzhuli/gst-plugin-cedar"
+	"http://github.com/gtalusan/gst-plugin-cedar"
 )
