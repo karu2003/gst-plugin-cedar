@@ -1,4 +1,4 @@
-GStreamer 0.10 plugin for Cedar h264 hardware encoding with no binary blobs.
+GStreamer 1.0 plugin for Cedar h264 hardware encoding with no binary blobs.
 
 Based on PoC h264 encoder by Jens Kuske:
 https://github.com/jemk/cedrus/tree/master/h264enc
