@@ -299,7 +299,6 @@ h264enc *h264enc_new(const struct h264enc_params *p)
 	if (c->luma_buffer == NULL)
 		goto nomem;
 
-	c->chroma_buffer = c->luma_buffer + p->src_width * p->src_height;
 	a = c->luma_buffer->virt + p->src_width * p->src_height;
 	m = malloc(sizeof(struct ve_mem));
 	if (m == NULL)
