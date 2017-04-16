@@ -128,11 +128,11 @@ static void gst_cedarh264enc_class_init(GstCedarH264EncClass *klass)
 
 	g_object_class_install_property (gobject_class, PROP_QP,
 		g_param_spec_int("qp", "QP", "H264 quantization parameters",
-		0, 47, 30, G_PARAM_READWRITE));
+		0, 47, 15, G_PARAM_READWRITE));
 
 	g_object_class_install_property (gobject_class, PROP_KEYFRAME_INTERVAL,
 		g_param_spec_int ("keyint", "keyframe-interval", "Keyframe Interval",
-		1, 500, 30, G_PARAM_READWRITE));
+		0, 500, 0, G_PARAM_READWRITE));
 }
 
 static gboolean gst_cedarh264enc_sink_event(GstPad *pad, GstObject *parent, GstEvent *event)
@@ -169,8 +169,8 @@ static void gst_cedarh264enc_init(GstCedarH264Enc *filter)
 	gst_element_add_pad(GST_ELEMENT(filter), filter->sinkpad);
 	gst_element_add_pad(GST_ELEMENT(filter), filter->srcpad);
 
-	filter->pic_init_qp = 30;
-	filter->keyframe_interval = 30;
+	filter->pic_init_qp = 15;
+	filter->keyframe_interval = 0;
 }
 
 static void gst_cedarh264enc_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
