@@ -260,7 +260,7 @@ static GstFlowReturn gst_cedarh264enc_chain(GstPad *pad, GstObject *parent, GstB
 	GstCedarH264Enc *filter;
 	GstBuffer *outbuf;
 	GstMapInfo info;
-	gsize output_buf_num_bytes;
+	gsize len;
 
 	filter = GST_CEDAR_H264ENC(GST_OBJECT_PARENT(pad));
 
@@ -295,22 +295,19 @@ static GstFlowReturn gst_cedarh264enc_chain(GstPad *pad, GstObject *parent, GstB
 
 	memcpy(h264enc_get_input_buffer(filter->enc), info.data, info.size);
 
-	if (h264enc_encode_picture(filter->enc)) {
-		// TODO: use gst_pad_alloc_buffer
-		output_buf_num_bytes = h264enc_get_bytestream_length(filter->enc);
-		outbuf = gst_buffer_new_and_alloc(output_buf_num_bytes);
-
-		gst_buffer_fill(outbuf, 0, h264enc_get_bytestream_buffer(filter->enc), output_buf_num_bytes);
-
-		GST_BUFFER_TIMESTAMP(outbuf) = GST_BUFFER_TIMESTAMP(buf);
-
-		gst_buffer_unmap(buf, &info);
-		gst_buffer_unref(buf);
-
-		return gst_pad_push(filter->srcpad, outbuf);
-	} else {
+	if (!h264enc_encode_picture(filter->enc)) {
 		return GST_FLOW_ERROR;
 	}
+	len = h264enc_get_bytestream_length(filter->enc);
+	outbuf = gst_buffer_new_wrapped_full(0,
+		h264enc_get_bytestream_buffer(filter->enc),
+		len, 0, len, 0, 0);
+	GST_BUFFER_TIMESTAMP(outbuf) = GST_BUFFER_TIMESTAMP(buf);
+
+	gst_buffer_unmap(buf, &info);
+	gst_buffer_unref(buf);
+
+	return gst_pad_push(filter->srcpad, outbuf);
 }
 
 static GstStateChangeReturn gst_cedarh264enc_change_state(GstElement *element, GstStateChange transition)
