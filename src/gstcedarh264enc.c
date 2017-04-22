@@ -64,7 +64,8 @@ enum
 {
 	PROP_0,
 	PROP_QP,
-	PROP_KEYFRAME_INTERVAL
+	PROP_KEYFRAME_INTERVAL,
+	PROP_ALWAYS_COPY
 };
 
 /* the capabilities of the inputs and outputs.
@@ -127,12 +128,16 @@ static void gst_cedarh264enc_class_init(GstCedarH264EncClass *klass)
 	gstelement_class->change_state = gst_cedarh264enc_change_state;
 
 	g_object_class_install_property (gobject_class, PROP_QP,
-		g_param_spec_int("qp", "QP", "H264 quantization parameters",
+		g_param_spec_int ("qp", "QP", "H264 quantization parameters",
 		0, 47, 15, G_PARAM_READWRITE));
 
 	g_object_class_install_property (gobject_class, PROP_KEYFRAME_INTERVAL,
 		g_param_spec_int ("keyint", "keyframe-interval", "Keyframe Interval",
 		0, 500, 0, G_PARAM_READWRITE));
+
+	g_object_class_install_property (gobject_class, PROP_ALWAYS_COPY,
+		g_param_spec_boolean ("always-copy", "Always Copy", "Always Copy Buffers",
+		TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static gboolean gst_cedarh264enc_sink_event(GstPad *pad, GstObject *parent, GstEvent *event)
@@ -171,6 +176,7 @@ static void gst_cedarh264enc_init(GstCedarH264Enc *filter)
 
 	filter->pic_init_qp = 15;
 	filter->keyframe_interval = 0;
+	filter->always_copy = FALSE;
 }
 
 static void gst_cedarh264enc_set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec)
@@ -184,6 +190,10 @@ static void gst_cedarh264enc_set_property(GObject *object, guint prop_id, const 
 
 	case PROP_KEYFRAME_INTERVAL:
 		filter->keyframe_interval = g_value_get_int(value);
+		break;
+
+	case PROP_ALWAYS_COPY:
+		filter->always_copy = g_value_get_boolean(value);
 		break;
 
 	default:
@@ -203,6 +213,10 @@ static void gst_cedarh264enc_get_property(GObject *object, guint prop_id, GValue
 
 	case PROP_KEYFRAME_INTERVAL:
 		g_value_set_int(value, filter->keyframe_interval);
+		break;
+
+	case PROP_ALWAYS_COPY:
+		g_value_set_boolean(value, filter->always_copy);
 		break;
 
 	default:
@@ -299,9 +313,14 @@ static GstFlowReturn gst_cedarh264enc_chain(GstPad *pad, GstObject *parent, GstB
 		return GST_FLOW_ERROR;
 	}
 	len = h264enc_get_bytestream_length(filter->enc);
-	outbuf = gst_buffer_new_wrapped_full(0,
-		h264enc_get_bytestream_buffer(filter->enc),
-		len, 0, len, 0, 0);
+	if (filter->always_copy) {
+		outbuf = gst_buffer_new_and_alloc(len);
+		gst_buffer_fill(outbuf, 0, h264enc_get_bytestream_buffer(filter->enc), len);
+	} else {
+		outbuf = gst_buffer_new_wrapped_full(0,
+			h264enc_get_bytestream_buffer(filter->enc),
+			len, 0, len, 0, 0);
+	}
 	GST_BUFFER_TIMESTAMP(outbuf) = GST_BUFFER_TIMESTAMP(buf);
 
 	gst_buffer_unmap(buf, &info);
