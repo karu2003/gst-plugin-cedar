@@ -6,7 +6,9 @@ https://github.com/jemk/cedrus/tree/master/h264enc
 Usage: tested KERNEL 6.2 on Banana Pi M2 Zero
 # Save
 gst-launch-1.0 videotestsrc ! cedar_h264enc ! h264parse ! matroskamux ! filesink location=cedar.mkv -e
+
 gst-launch-1.0 -vv videotestsrc ! cedar_h264enc ! h264parse ! mp4mux ! filesink location=cedar.mp4 -e
+
 gst-launch-1.0 -vv videotestsrc ! cedar_h264enc ! h264parse ! qtmux ! filesink location=cedar.mp4 -e
 
 # Play
