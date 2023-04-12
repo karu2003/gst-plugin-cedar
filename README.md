@@ -9,7 +9,7 @@ gst-launch-1.0 videotestsrc ! cedar_h264enc ! h264parse ! matroskamux ! filesink
 gst-launch-1.0 -vv videotestsrc ! cedar_h264enc ! h264parse ! mp4mux ! filesink location=cedar.mp4 -e
 gst-launch-1.0 -vv videotestsrc ! cedar_h264enc ! h264parse ! qtmux ! filesink location=cedar.mp4 -e
 
-#Play
+# Play
 ffmpeg -i cedar.mp4 -pix_fmt bgra -f fbdev /dev/fb0
 
 # Stream H264
