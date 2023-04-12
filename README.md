@@ -14,6 +14,15 @@ gst-launch-1.0 -vv videotestsrc ! cedar_h264enc ! h264parse ! qtmux ! filesink l
 # Play
 ffmpeg -i cedar.mp4 -pix_fmt bgra -f fbdev /dev/fb0
 
+gst-launch-1.0 filesrc location=cedar.mp4 ! qtdemux ! h264parse ! openh264dec ! videoconvert ! fbdevsink
+
+gst-launch-1.0 filesrc location=cedar.mp4 ! qtdemux ! h264parse ! avdec_h264 ! videoconvert ! fbdevsink
+
+gst-launch-1.0 filesrc location=cedar.mp4 ! qtdemux ! h264parse ! openh264dec ! videoconvert ! autovideosink
+
+
+
+
 # Stream H264
 # Server
 media-ctl --device /dev/media0 --set-v4l2 '"ov5640 1-003c":0[fmt:UYVY8_2X8/1280x720@1/30]'
